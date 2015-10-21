@@ -35,60 +35,60 @@
 					printEmployee:
 							; Save register values that will be modified in this routine
 002C	50				PUSH AX		; FIX ME
-002D	51				PUSH CX		; FIX ME
+002D	53				PUSH BX		; FIX ME
 002E	56				PUSH SI		; FIX ME
 					
 							; Calculate starting address of this record
 							; Starting address is START+(REC_NUM*REC_SIZE)
 002F	B405				MOV AH, REC_SIZE				; FIX ME  Load REC_SIZE into AH
-0031	F6E4				MUL AH				; FIX ME  Multiply REC_NUM (already in AL) by REC_SIZE (in AH)
-0033	050000				ADD AX, 0				; FIX ME  Compute START+(REC_NUM*REC_SIZE)
+0031	F6E4				MUL AH							; FIX ME  Multiply REC_NUM (already in AL) by REC_SIZE (in AH)
+0033	01C3				ADD BX, AX						; FIX ME  Compute START+(REC_NUM*REC_SIZE)
 					
 							; Print 'Name: ' label
-0036	BE0000				MOV SI, s_name					; FIX ME
-0039	E83B00				CALL printStr
+0035	BE0000				MOV SI, s_name					; FIX ME
+0038	E83E00				CALL printStr
 					
 							; Print Mr/Mrs according to gender
-003C	B103				MOV CL, GENDER					; FIX ME  Load the gender field into AL. Need to use displacement addressing mode
-003E	80F900				CMP CL, male				; Compare gender to zero
-0041	7409				je printMale
+003B	8A4703				MOV AL, [BX + GENDER]			; FIX ME  Load the gender field into AL. Need to use displacement addressing mode
+003E	3C00				CMP AL, male					; Compare gender to zero
+0040	7409				je printMale
 						printFemale:
-0043	BE0C00				MOV SI, s_female					; FIX ME  Print Ms.
-0046	E82E00				CALL printStr
-0049	E90600				JMP	printName
+0042	BE0C00				MOV SI, s_female				; FIX ME  Print Ms.
+0045	E83100				CALL printStr
+0048	E90600				JMP	printName
 						printMale:
-004C	BE0700				MOV SI, s_male				; FIX ME  Print Mr.
-004F	E82500				CALL printStr
+004B	BE0700				MOV SI, s_male					; FIX ME  Print Mr.
+004E	E82800				CALL printStr
 					
 							; Print name. Must load name pointer into SI, then call printStr
 						printName:
-0052	BE0100				MOV SI, NAME					; FIX ME  Load the name field as input parameter. Need to use displacement addressing mode
-0055	E81F00				CALL printStr				
-0058	E88000				CALL newLine							; FIX ME  Print a newLine character
+0051	8B7701				MOV SI, [BX + NAME]				; FIX ME  Load the name field as input parameter. Need to use displacement addressing mode
+0054	E82200				CALL printStr				
+0057	E88300				CALL newLine					; FIX ME  Print a newLine character
 							
 							; Print employee number
 						printEmpNum:
-005B	BE1100				MOV SI, s_empNum						; FIX ME Print 'Employee number: '
-005E	E81600				CALL printStr
-0061	BE0000				MOV SI, ID					; FIX ME  Print employee number. (Need to use displacement addressing mode)
-0064	E83300				CALL printInt
-														; FIX ME  Print a newLine character
+005A	BE1100				MOV SI, s_empNum				; FIX ME Print 'Employee number: '
+005D	E81900				CALL printStr	
+0060	8A4700				MOV AL, [BX + ID]			; FIX ME  Print employee number. (Need to use displacement addressing mode)
+0063	E83600				CALL printInt
+0066	E87400				CALL newLine					; FIX ME  Print a newLine character
 					
 							; Print employee salary
 						printEmpSalary:
-0067	BE2300				MOV SI, s_salary			; FIX ME  Print the 'Salary: ' label 
-006A	E80A00				CALL printStr
-006D	B90400				MOV CX, SALARY				; FIX ME  Load the SALARY field into AL. Need to use displacement addressing mode
-0070	E84C00				CALL printSalary			; Prints salary in 1000's of $
-														; FIX ME  Print a newLine character
+0069	BE2300				MOV SI, s_salary				; FIX ME  Print the 'Salary: ' label 
+006C	E80A00				CALL printStr
+006F	8A4704				MOV AL, [BX + SALARY]					; FIX ME  Load the SALARY field into AL. Need to use displacement addressing mode
+0072	E84C00				CALL printSalary				; Prints salary in 1000's of $
+															; FIX ME  Print a newLine character
 					
 							; Restore registers
-0073	5E				POP SI	; FIX ME
-0074	59				POP CX		; FIX ME
-0075	58				POP AX		; FIX ME
+0075	5E				POP SI		; FIX ME
+0076	5B				POP BX		; FIX ME
+0077	58				POP AX		; FIX ME
 					
 						; Return to calling function
-0076	C3			RET
+0078	C3			RET
 					
 					
 					;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -103,26 +103,26 @@
 					;	None.
 					printStr:
 						; Save registers modified by this subroutine
-0077	52			PUSH DX		; FIX ME
-0078	53			PUSH BX		; FIX ME
-0079	56			PUSH SI		; FIX ME
+0079	52			PUSH DX		; FIX ME
+007A	53			PUSH BX		; FIX ME
+007B	56			PUSH SI		; FIX ME
 					
-007A	BAE904			MOV DX, Display
-007D	BB0000			MOV BX,0
+007C	BAE904			MOV DX, Display
+007F	BB0000			MOV BX,0
 					LoopPS:
-0080	8A00			MOV AL, [SI+BX]	; Load the next char to be printed - USING INPUT PARAMETER SI
-0082	3C24			CMP AL, '$'		; Compare the char to '$'
-0084	7405			JE quitPS		; If it is equal, then quit subroutine and return to calling code
-0086	EE			OUT DX,AL		; If it is not equal to '$', then print it
-0087	43			INC BX			; Point to the next char to be printed
-0088	E9F5FF			jmp LoopPS		; Jump back to the top of the loop
+0082	8A00			MOV AL, [SI+BX]	; Load the next char to be printed - USING INPUT PARAMETER SI
+0084	3C24			CMP AL, '$'		; Compare the char to '$'
+0086	7405			JE quitPS		; If it is equal, then quit subroutine and return to calling code
+0088	EE			OUT DX,AL		; If it is not equal to '$', then print it
+0089	43			INC BX			; Point to the next char to be printed
+008A	E9F5FF			jmp LoopPS		; Jump back to the top of the loop
 					quitPS:
 						; Restore registers
-008B	5E			POP SI		; FIX ME
-008C	5B			POP BX		; FIX ME
-008D	5A			POP DX		; FIX ME
+008D	5E			POP SI		; FIX ME
+008E	5B			POP BX		; FIX ME
+008F	5A			POP DX		; FIX ME
 					
-008E	C3			RET
+0090	C3			RET
 					
 					
 					;;;;;;;;;;;;;;;;;
@@ -133,18 +133,18 @@
 					;	None.
 					printDigit:
 						; Save registers modified by this subroutine
-008F	52			PUSH DX		; FIX ME
-0090	50			PUSH AX		; FIX ME
+0091	52			PUSH DX		; FIX ME
+0092	50			PUSH AX		; FIX ME
 						
-0091	BAE904			MOV DX, Display
-0094	0430			ADD AL, '0'		; Convert number to ASCII code
-0096	EE			OUT DX,AL		; Print it
+0093	BAE904			MOV DX, Display
+0096	0430			ADD AL, '0'		; Convert number to ASCII code
+0098	EE			OUT DX,AL		; Print it
 						
 						; Restore registers
-0097	58			POP AX		; FIX ME
-0098	5A			POP DX		; FIX ME
+0099	58			POP AX		; FIX ME
+009A	5A			POP DX		; FIX ME
 						
-0099	C3			RET
+009B	C3			RET
 						
 							
 					;;;;;;;;;;;;;;;;;
@@ -155,31 +155,31 @@
 					;	None.
 					printInt:
 						; Save registers modified by this subroutine
-009A	52			PUSH DX		; FIX ME
-009B	51			PUSH CX		; FIX ME
-009C	50			PUSH AX		; FIX ME
+009C	52			PUSH DX		; FIX ME
+009D	51			PUSH CX		; FIX ME
+009E	50			PUSH AX		; FIX ME
 						
-009D	BAE904			MOV DX, Display
-00A0	B10A			MOV CL, 10		; Will be dividing by 10...
+009F	BAE904			MOV DX, Display
+00A2	B10A			MOV CL, 10		; Will be dividing by 10...
 						
 					LoopPI:
-00A2	3C0A			CMP AL, 10		; Compare the number to 10
-00A4	7C0C			JL printLast	; If it is less than 10, then print this digit
+00A4	3C0A			CMP AL, 10		; Compare the number to 10
+00A6	7C0C			JL printLast	; If it is less than 10, then print this digit
 						; If it is greater than 10, divide by 10
-00A6	B400			MOV AH, 0		; Clear AH
-00A8	F6F1			DIV CL			; Divide number by 10
-00AA	E8E2FF			CALL printDigit ; Print the quotient in AL
-00AD	88E0			MOV AL, AH		; Move remainder into AL to be printed
-00AF	E9F0FF			jmp LoopPI		; Jump back to the top of the loop
+00A8	B400			MOV AH, 0		; Clear AH
+00AA	F6F1			DIV CL			; Divide number by 10
+00AC	E8E2FF			CALL printDigit ; Print the quotient in AL
+00AF	88E0			MOV AL, AH		; Move remainder into AL to be printed
+00B1	E9F0FF			jmp LoopPI		; Jump back to the top of the loop
 					printLast:
-00B2	E8DAFF			CALL printDigit
+00B4	E8DAFF			CALL printDigit
 						
 						; Restore registers
-00B5	58			POP AX		; FIX ME
-00B6	59			POP CX		; FIX ME
-00B7	5A			POP DX		; FIX ME
+00B7	58			POP AX		; FIX ME
+00B8	59			POP CX		; FIX ME
+00B9	5A			POP DX		; FIX ME
 						
-00B8	C3			RET
+00BA	C3			RET
 					
 					
 					;;;;;;;;;;;;;;;;;
@@ -190,31 +190,31 @@
 					;	None.
 					
 					; Constant strings for this subroutine:
-00B9	2C30303024		s_thousands: .DB ',000$'
-00BE	24		s_dollars: .DB '$'
+00BB	2C30303024		s_thousands: .DB ',000$'
+00C0	24		s_dollars: .DB '$'
 					
 					printSalary:
 						; Save registers modified by this subroutine
-00BF	52			PUSH DX		; FIX ME
-00C0	50			PUSH AX		; FIX ME
-00C1	56			PUSH SI		; FIX ME
+00C1	52			PUSH DX		; FIX ME
+00C2	50			PUSH AX		; FIX ME
+00C3	56			PUSH SI		; FIX ME
 						
-00C2	BAE904			MOV DX, Display
+00C4	BAE904			MOV DX, Display
 						
-00C5	88C4			MOV AH,AL			; Keep a copy of the salary in AH (need AL for printing...)
-00C7	8A06BE00			MOV AL, [s_dollars]	; Print '$' preceeding number
-00CB	EE			OUT DX,AL			; Print it
-00CC	88E0			MOV AL,AH			; Move salary back into AL
-00CE	E8C9FF			CALL printInt		; Print the salary (0-255)
-00D1	BEB900			MOV SI, s_thousands	; Move the starting address of s_thousands string into BX
-00D4	E8A0FF			CALL printStr 		; Print ',000'
+00C7	88C4			MOV AH,AL			; Keep a copy of the salary in AH (need AL for printing...)
+00C9	8A06C000			MOV AL, [s_dollars]	; Print '$' preceeding number
+00CD	EE			OUT DX,AL			; Print it
+00CE	88E0			MOV AL,AH			; Move salary back into AL
+00D0	E8C9FF			CALL printInt		; Print the salary (0-255)
+00D3	BEBB00			MOV SI, s_thousands	; Move the starting address of s_thousands string into BX
+00D6	E8A0FF			CALL printStr 		; Print ',000'
 						
 						; Restore registers
-00D7	5E			POP SI		; FIX ME
-00D8	58			POP AX		; FIX ME
-00D9	5A			POP DX		; FIX ME
+00D9	5E			POP SI		; FIX ME
+00DA	58			POP AX		; FIX ME
+00DB	5A			POP DX		; FIX ME
 						
-00DA	C3			RET
+00DC	C3			RET
 					
 					
 					;;;;;;;;;;;;;;;;;
@@ -230,20 +230,20 @@
 					
 					newLine:
 						; Save registers modified by this subroutine
-00DB	52			PUSH DX		; FIX ME
-00DC	50			PUSH AX		; FIX ME
+00DD	52			PUSH DX		; FIX ME
+00DE	50			PUSH AX		; FIX ME
 						
-00DD	BAE904			MOV DX, Display		; Initialize the output port number in DX
-00E0	B00A			MOV AL, s_LF		; Load line feed (LF) into AL
-00E2	EE			out DX,AL			; print the char
-00E3	B00D			MOV AL, s_CR		; Load carriage return (CR) into AL
-00E5	EE			out DX,AL			; print the char
+00DF	BAE904			MOV DX, Display		; Initialize the output port number in DX
+00E2	B00A			MOV AL, s_LF		; Load line feed (LF) into AL
+00E4	EE			out DX,AL			; print the char
+00E5	B00D			MOV AL, s_CR		; Load carriage return (CR) into AL
+00E7	EE			out DX,AL			; print the char
 						
 						; Restore registers
-00E6	58			POP AX		; FIX ME
-00E7	5A			POP DX		; FIX ME
+00E8	58			POP AX		; FIX ME
+00E9	5A			POP DX		; FIX ME
 						
-00E8	C3			RET
+00EA	C3			RET
 						
 					;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 					; END OF SUBROUTINES FROM lab5-P1.asm
@@ -255,25 +255,25 @@
 					main:
 					
 						; Print dayShiftDB[2]
-00E9	B80050			MOV  AX, dayShiftDB		; FIX ME Load address of dayShiftDB in register (?)
-00EC	B93450			MOV  CX, name2				; FIX ME Load record number in register (?)
-00EF	E83AFF			CALL printEmployee
-00F2	E8E6FF			CALL newLine
+00EB	BB0050			MOV  BX, dayShiftDB			; FIX ME Load address of dayShiftDB in register (?)
+00EE	B002			MOV  AL, 2					; FIX ME Load record number in register (?)
+00F0	E839FF			CALL printEmployee
+00F3	E8E7FF			CALL newLine
 						
 						; Print nightShiftDB[0]
-00F5	B81450			MOV  AX, nightShiftDB				; FIX ME Load address of nightShiftDB
-00F8	B91E50			MOV  CX, name0			; FIX ME Load record number
+00F6	BB1450			MOV  BX, nightShiftDB		; FIX ME Load address of nightShiftDB
+00F9	B000			MOV  AL, 0					; FIX ME Load record number
 00FB	E82EFF			CALL printEmployee
-00FE	E8DAFF			CALL newLine
+00FE	E8DCFF			CALL newLine
 						
 						; Print dayShiftDB[3]
-0101	B80050			MOV  AX,dayShiftDB			; FIX ME Load address of dayShiftDB
-0104	B94150			MOV  CX, name3			; FIX ME Load record number
-0107	E822FF			CALL printEmployee
-010A	E8CEFF			CALL newLine
+0101	BB0050			MOV  BX, dayShiftDB			; FIX ME Load address of dayShiftDB
+0104	B003			MOV  AL, 3					; FIX ME Load record number
+0106	E823FF			CALL printEmployee
+0109	E8D1FF			CALL newLine
 						
 						;Quit
-010D	F4			HLT
+010C	F4			HLT
 						
 						
 					;;;;;;;;;;;;;;;;;;;;;;;;

@@ -35,56 +35,56 @@ female		.EQU 1	;
 printEmployee:
 		; Save register values that will be modified in this routine
 		PUSH AX		; FIX ME
-		PUSH CX		; FIX ME
+		PUSH BX		; FIX ME
 		PUSH SI		; FIX ME
 
 		; Calculate starting address of this record
 		; Starting address is START+(REC_NUM*REC_SIZE)
 		MOV AH, REC_SIZE				; FIX ME  Load REC_SIZE into AH
-		MUL AH				; FIX ME  Multiply REC_NUM (already in AL) by REC_SIZE (in AH)
-		ADD AX, 0				; FIX ME  Compute START+(REC_NUM*REC_SIZE)
+		MUL AH							; FIX ME  Multiply REC_NUM (already in AL) by REC_SIZE (in AH)
+		ADD BX, AX						; FIX ME  Compute START+(REC_NUM*REC_SIZE)
 
 		; Print 'Name: ' label
 		MOV SI, s_name					; FIX ME
 		CALL printStr
 
 		; Print Mr/Mrs according to gender
-		MOV CL, GENDER					; FIX ME  Load the gender field into AL. Need to use displacement addressing mode
-		CMP CL, male				; Compare gender to zero
+		MOV AL, [BX + GENDER]			; FIX ME  Load the gender field into AL. Need to use displacement addressing mode
+		CMP AL, male					; Compare gender to zero
 		je printMale
 	printFemale:
-		MOV SI, s_female					; FIX ME  Print Ms.
+		MOV SI, s_female				; FIX ME  Print Ms.
 		CALL printStr
 		JMP	printName
 	printMale:
-		MOV SI, s_male				; FIX ME  Print Mr.
+		MOV SI, s_male					; FIX ME  Print Mr.
 		CALL printStr
 
 		; Print name. Must load name pointer into SI, then call printStr
 	printName:
-		MOV SI, NAME					; FIX ME  Load the name field as input parameter. Need to use displacement addressing mode
+		MOV SI, [BX + NAME]				; FIX ME  Load the name field as input parameter. Need to use displacement addressing mode
 		CALL printStr				
-		CALL newLine							; FIX ME  Print a newLine character
+		CALL newLine					; FIX ME  Print a newLine character
 		
 		; Print employee number
 	printEmpNum:
-		MOV SI, s_empNum						; FIX ME Print 'Employee number: '
-		CALL printStr
-		MOV SI, ID					; FIX ME  Print employee number. (Need to use displacement addressing mode)
+		MOV SI, s_empNum				; FIX ME Print 'Employee number: '
+		CALL printStr	
+		MOV AL, [BX + ID]			; FIX ME  Print employee number. (Need to use displacement addressing mode)
 		CALL printInt
-									; FIX ME  Print a newLine character
+		CALL newLine					; FIX ME  Print a newLine character
 
 		; Print employee salary
 	printEmpSalary:
-		MOV SI, s_salary			; FIX ME  Print the 'Salary: ' label 
+		MOV SI, s_salary				; FIX ME  Print the 'Salary: ' label 
 		CALL printStr
-		MOV CX, SALARY				; FIX ME  Load the SALARY field into AL. Need to use displacement addressing mode
-		CALL printSalary			; Prints salary in 1000's of $
-									; FIX ME  Print a newLine character
+		MOV AL, [BX + SALARY]					; FIX ME  Load the SALARY field into AL. Need to use displacement addressing mode
+		CALL printSalary				; Prints salary in 1000's of $
+										; FIX ME  Print a newLine character
 
 		; Restore registers
-		POP SI	; FIX ME
-		POP CX		; FIX ME
+		POP SI		; FIX ME
+		POP BX		; FIX ME
 		POP AX		; FIX ME
 
 	; Return to calling function
@@ -255,20 +255,20 @@ newLine:
 main:
 
 	; Print dayShiftDB[2]
-	MOV  AX, dayShiftDB		; FIX ME Load address of dayShiftDB in register (?)
-	MOV  CX, name2				; FIX ME Load record number in register (?)
+	MOV  BX, dayShiftDB			; FIX ME Load address of dayShiftDB in register (?)
+	MOV  AL, 2					; FIX ME Load record number in register (?)
 	CALL printEmployee
 	CALL newLine
 	
 	; Print nightShiftDB[0]
-	MOV  AX, nightShiftDB				; FIX ME Load address of nightShiftDB
-	MOV  CX, name0			; FIX ME Load record number
+	MOV  BX, nightShiftDB		; FIX ME Load address of nightShiftDB
+	MOV  AL, 0					; FIX ME Load record number
 	CALL printEmployee
 	CALL newLine
 	
 	; Print dayShiftDB[3]
-	MOV  AX,dayShiftDB			; FIX ME Load address of dayShiftDB
-	MOV  CX, name3			; FIX ME Load record number
+	MOV  BX, dayShiftDB			; FIX ME Load address of dayShiftDB
+	MOV  AL, 3					; FIX ME Load record number
 	CALL printEmployee
 	CALL newLine
 	
