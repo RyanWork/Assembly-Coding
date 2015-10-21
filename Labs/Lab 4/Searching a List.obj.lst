@@ -1,0 +1,90 @@
+					; SYSC2001 - Lab 4
+					; Program to complete 8-bit unsigned number to NASA
+					; 
+					
+					Display	.EQU 04E9h			;Display variable assigned to 04E9h
+					
+					.ORG 0010h					;Start at 0010h
+					
+					;Start of list of applicants
+					AppNums:			
+0010	01			.DB 01
+0011	02			.DB 02
+0012	03			.DB 03
+0013	04			.DB 04
+0014	05			.DB 05
+0015	06			.DB 06
+0016	07			.DB 07			
+0017	08			.DB 08
+0018	09			.DB 09
+0019	0A			.DB 10
+001A	FF		Sent: .DB 0xFF				;Sentinel Variable at the end of the list addresses
+					
+					;Intialize other necessary variables
+001B	02		myNum: .DB 02				;Assigned number to contestant
+001C	09		numIter: .DB 09				;initializes a value of 'n' iterations to loop
+						
+					.ORG 0100h					;Initialize text in memory
+					
+					;If user wins
+0100	20776173..		winMsg: .DB ' was your position. You won!$'		;Win statement
+					
+					;If user loses
+011D	596F7520..		loseMsg: .DB 'You lose :($'	;Lose statement
+					
+					.ORG 0200h					;Start main code at 0200h
+					
+					;Initialization
+					Main:						;Initialization Header
+0200	BAE904			MOV DX, Display			;Open I/O to DX register
+0203	BE1000			MOV SI, AppNums			;Point SI register to first value in list
+0206	B100			MOV CL, 00h				;Set counter to 0
+0208	8A061B00			MOV AL, [myNum]			;Set value of AL to myNum
+					
+					;Beginning of Loop
+					mainLoop:
+020C	81FE1A00			CMP SI, Sent			;Compare if SI register is sentinel variable
+0210	741C			JE loseNum				;If true, jump to sadMessage
+						
+0212	3A0E1C00			CMP CL, [numIter]		;Compare value of counter with number of Iterations
+0216	7F16			JG loseNum				;If counter > number of Iterations jump to sadMessage
+					
+					;Check if the number is a winning number
+					checkNum:
+0218	3804			CMP [SI], AL			;Compare value at SI to assigned number
+021A	7406			JE winNum				;Jump to winNum if they are equal
+						
+					;Point to next item in list
+					pointNext:
+021C	46			INC SI					;Point SI to next address in list
+021D	FEC1			INC CL					;Increment value of counter
+021F	E9EAFF			JMP mainLoop			;Jump back to mainLoop
+						
+					;Print out winning messag
+					winNum:
+0222	80C131			ADD CL, 31h
+0225	88C8			MOV AL, CL			;Mov position number into AL
+0227	EE			OUT DX, AL				;Print position number
+0228	BB0001			MOV BX, winMsg			;BX points to first character in winning message
+022B	E90700			JMP printChar			;Jump to print character
+						
+					;Print Losing Message
+					loseNum:
+022E	BB1D01			MOV BX, loseMsg			;BX point to first character in losing message
+0231	E90100			JMP printChar			;Jump to print character
+					
+					;Point to next char in message
+					nextChar:
+0234	43			INC BX					;BX to point to next char
+						
+					;Print characters in message
+					printChar:
+0235	8A07			MOV AL, [BX]			;Move character into AL
+0237	3C24			CMP AL, '$'				;Check if delimiter in string
+0239	7404			JE quit					;If pointing to delimiter, exit program
+023B	EE			OUT DX, AL				;Else, print character
+023C	E9F5FF			JMP nextChar			;Jump to nextChar
+					
+					;Quit program
+					quit:						
+023F	F4			HLT						;Causes the program to stop

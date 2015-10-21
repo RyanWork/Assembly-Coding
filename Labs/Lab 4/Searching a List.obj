@@ -1,0 +1,43 @@
+3 42 512 118   
+0010101AppNums0120
+00111020220
+00121030320
+00131040420
+00141050520
+00151060620
+00161070720
+00171080820
+00181090920
+001910A1020
+001A1FFSentFFH20
+001B102myNum0220
+001C109numIter0920
+0100292077617320796F757220706F736974696F6E2E20596F7520776F6E2124winMsg' was your position. You won!$'20
+011D12596F75206C6F7365203A2824loseMsg'You lose :($'20
+02003BAE904Mainmov DX, 04E9H20
+02033BE1000mov SI, AppNums20
+02062B100mov CL, 00H20
+020848A061B00mov AL, [myNum]20
+020C481FE1A00mainLoopcmp SI, Sent20
+02102741Cje loseNum20
+021243A0E1C00cmp CL, [numIter]20
+021627F16jg loseNum20
+021823804checkNumcmp [SI], AL20
+021A27406je winNum20
+021C146pointNextinc SI20
+021D2FEC1inc CL20
+021F3E9EAFFjmp mainLoop20
+0222380C131winNumadd CL, 31H20
+0225288C8mov AL, CL20
+02271EEout DX, AL20
+02283BB0001mov BX, winMsg20
+022B3E90700jmp printChar20
+022E3BB1D01loseNummov BX, loseMsg20
+02313E90100jmp printChar20
+0234143nextCharinc BX20
+023528A07printCharmov AL, [BX]20
+023723C24cmp AL, '$'20
+023927404je quit20
+023B1EEout DX, AL20
+023C3E9F5FFjmp nextChar20
+023F1F4quithlt20

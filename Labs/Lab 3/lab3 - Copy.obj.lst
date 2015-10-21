@@ -1,0 +1,18 @@
+					; SYSC2001 - Lab 3
+					; Program to complete 8-bit unsigned shift & add multiplication
+					; AH = A; CH = Q; BH = M; Final 16-bit result in AX
+					
+					.ORG 0000h
+					Data:
+0000	0F			Y:	.DB	15		; Multiplicand
+0001	49			X: 	.DB	73		; Multiplier
+						
+					.ORG 0010h
+					Init:
+0010	B00F			MOV	AL, 0Fh 	; Initialize AX to zero. AH serves as accumulator and AX will hold product
+0012	BB4900			MOV BX, 49h
+						
+0015	F7E3			MUL BX
+						
+					quit:
+0017	F4			HLT

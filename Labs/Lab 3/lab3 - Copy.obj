@@ -1,0 +1,7 @@
+3 6 16 10    
+000010FY1520
+0001149X7320
+00102B00FInitmov AL, 0FH20
+00123BB4900mov BX, 49H20
+00152F7E3mul BX20
+00171F4quithlt20
